@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: ecom-rabbitmq-deployment
+spec:
+  replicas: {{ .Values.replicaCount.rabbitmq }}
+  selector:
+    matchLabels:
+      app: ecom-rabbitmq
+  template:
+    metadata:
+      labels:
+        app: ecom-rabbitmq
+    spec:
+      containers:
+        - name: ecom-rabbitmq
+          image: rabbitmq:3-management
+          ports:
+            - containerPort: {{ .Values.service.rabbitmq_port }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: rabbitmq-svc
+spec:
+  selector:
+    app: ecom-rabbitmq
+  ports:
+    - port: {{ .Values.service.rabbitmq_port }}
+      targetPort: {{ .Values.service.rabbitmq_port }}
+  type: {{ .Values.service.type }}

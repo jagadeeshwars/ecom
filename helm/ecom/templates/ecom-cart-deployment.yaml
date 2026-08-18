@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: ecom-cart-deployment
+spec:
+  replicas: {{ .Values.replicaCount.cart }}
+  selector:
+    matchLabels:
+      app: ecom-cart
+  template:
+    metadata:
+      labels:
+        app: ecom-cart
+    spec:
+      containers:
+        - name: ecom-cart
+          image: {{ .Values.image.repository }}/ecom-cart:{{ .Values.image.tag }}
+          ports:
+            - containerPort: {{ .Values.service.cart_port }}
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ecom-secrets
+                  key: JWT_SECRET
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: ecom-cart-svc
+spec:
+  selector:
+    app: ecom-cart
+  ports:
+    - port: {{ .Values.service.cart_port}}
+      targetPort: {{ .Values.service.cart_port }}
+  type: {{ .Values.service.type }}

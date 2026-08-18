@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  namespace: {{ .Values.namespace }}
+  name: ecom-redis-deployment
+spec:
+  replicas: {{ .Values.replicaCount.redis }}
+  selector: 
+    matchLabels:
+      app: ecom-redis
+  template:
+    metadata:
+      labels: 
+        app: ecom-redis
+    spec:
+      containers:
+        - name: ecom-redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: {{ .Values.service.redis_port }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+    namespace: {{ .Values.namespace }}
+    name: ecom-redis-svc
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.redis_port }}
+      targetPort: {{ .Values.service.redis_port }}
+  selector:
+    app: ecom-redis

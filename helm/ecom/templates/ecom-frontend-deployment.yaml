@@ -1,0 +1,37 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-frontend-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount.frontend }}
+  selector:
+    matchLabels:
+      app: ecom-frontend
+  template:
+    metadata:
+      labels:
+        app: ecom-frontend
+    spec:
+      containers:
+        - name: ecom-frontend
+          image: {{ .Values.image.repository }}/ecom-frontend:{{ .Values.image.tag }}
+          ports:
+            - containerPort: {{ .Values.service.frontend_port }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-frontend-service
+  namespace: {{ .Values.namespace }}
+spec:
+  type: NodePort
+  ports:
+    - port: {{ .Values.service.frontend_port }}
+      targetPort: {{ .Values.service.frontend_port }}
+      nodePort: 30009
+  selector:
+    app: ecom-frontend

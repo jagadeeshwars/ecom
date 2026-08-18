@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-mongo-user-db-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount.mongo_user }}
+  selector:
+    matchLabels:
+      app: ecom-mongo-user-db
+  template:
+    metadata:
+      labels:
+        app: ecom-mongo-user-db
+    spec:
+      containers:
+        - name: ecom-mongo-user-db
+          image: mongo:8.3-noble
+          ports:
+            - containerPort: {{ .Values.service.mongo_port }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-user-db
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.mongo_port }}
+      targetPort: {{ .Values.service.mongo_port }}
+  selector:
+    app: ecom-mongo-user-db

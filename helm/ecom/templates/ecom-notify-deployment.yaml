@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: ecom-notify-deployment
+spec:
+  replicas: {{ .Values.replicaCount.notify }}
+  selector:
+    matchLabels:
+      app: ecom-notify
+  template:
+    metadata:
+      labels:
+        app: ecom-notify
+    spec:
+      containers:
+        - name: ecom-notify
+          image: {{ .Values.image.repository }}/ecom-notify:{{ .Values.image.tag }}
+          ports:
+            - containerPort: {{ .Values.service.notify_port }}
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: ecom-notify-svc
+spec:
+  selector:
+    app: ecom-notify
+  ports:
+    - port: {{ .Values.service.notify_port }}
+      targetPort: {{ .Values.service.notify_port }}
+  type: {{ .Values.service.type }}

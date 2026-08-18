@@ -1,0 +1,42 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-product-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount.product }}
+  selector:
+    matchLabels:
+      app: ecom-product
+  template:
+    metadata:
+      labels:
+        app: ecom-product
+    spec:
+      containers:
+        - name: ecom-product
+          image: {{ .Values.image.repository }}/ecom-product:{{ .Values.image.tag }}
+          ports:
+            - containerPort: {{ .Values.service.product_port }}
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ecom-secrets
+                  key: JWT_SECRET
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-product-svc
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.product_port }}
+      targetPort: {{ .Values.service.product_port }}
+  selector:
+    app: ecom-product

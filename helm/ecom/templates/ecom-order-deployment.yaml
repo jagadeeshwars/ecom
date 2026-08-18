@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: ecom-order-deployment
+spec: 
+  replicas: {{ .Values.replicaCount.order }}
+  selector: 
+    matchLabels:
+      app: ecom-order
+  template:
+    metadata:
+      labels:
+        app: ecom-order
+    spec:
+      containers:
+        - name: ecom-order
+          image: {{ .Values.image.repository }}/ecom-order:{{ .Values.image.tag }}
+          ports:
+            - containerPort: {{ .Values.service.order_port }}
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ecom-secrets
+                  key: JWT_SECRET
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: ecom-order-svc
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.order_port }}
+      targetPort: {{ .Values.service.order_port }}
+  selector:   
+    app: ecom-order
