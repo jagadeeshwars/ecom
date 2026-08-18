@@ -67,6 +67,7 @@ jobs:
           file: ./backend/order-service/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ecom-order:${{ github.run_id }} 
+<<<<<<< HEAD
   
   update-newtag-in-helm-chart:
     runs-on: ubuntu-latest
@@ -82,9 +83,32 @@ jobs:
           sed -i 's/tag: .*/tag: "${{github.run_id}}"/' helm/ecom/values.yaml
 
       - name: Commit and push changes
+=======
+
+  update-newtag-in-helm-chart:
+    runs-on: ubuntu-latest
+
+    needs: docker
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.TOKEN }}
+    
+      - name: Update tag in Helm chart
+        run: |
+          sed -i 's/tag: .*/tag: "${{github.run_id}}"/' helm/ecom/values.yaml
+
+      - name: Commit and push changes 
+>>>>>>> 74878f2c90b1a23c2c7b951438cf895905398832
         run: |
           git config --global user.email "jagadeesh80155@gmail.com"
           git config --global user.name "jagadeeshwars"
           git add helm/ecom/values.yaml
           git commit -m "Update tag in Helm chart"
+<<<<<<< HEAD
           git push
+=======
+          git push
+>>>>>>> 74878f2c90b1a23c2c7b951438cf895905398832
